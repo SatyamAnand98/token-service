@@ -1,7 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import Redis from 'ioredis';
 import { RedisService } from 'src/redis/redis.service';
-import { IEvent } from 'src/store/enums/event';
+import { EEvents } from 'src/store/enums/event.enum';
+import { IEvent } from 'src/store/interfaces/events.interface';
 
 @Injectable()
 export class PubSubService {
@@ -28,9 +29,10 @@ export class PubSubService {
   async subscribeToChannels() {
     console.log('Subscribed to topic token_created');
     await this.subscribe('token_created', async (message) => {
-      const data = JSON.parse(message.message);
+      const data: IEvent = JSON.parse(message.message);
       try {
         const token = data.token;
+        const eventType = data.eventType;
         const tokenData: IEvent = {
           username: data.username,
           rateLimiter: data.rateLimiter,
@@ -38,8 +40,14 @@ export class PubSubService {
           exp: data.exp,
           role: data.role,
           remainingRate: data.rateLimiter,
+          isActive: data.isActive,
         };
-        this.redisStateService.setKey(token, JSON.stringify(tokenData));
+
+        if (eventType == EEvents.DELETE_KEY) {
+          await this.redisStateService.clearKey(token);
+        } else {
+          this.redisStateService.setKey(token, JSON.stringify(tokenData));
+        }
       } catch (error) {
         console.log('Error:', error, message);
       }

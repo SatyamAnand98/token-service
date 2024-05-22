@@ -8,18 +8,15 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
-import { Model } from 'mongoose';
-import { AccessToken } from 'src/store/Schema/token.entity';
+import { RedisService } from 'src/redis/redis.service';
 import { EDbNames } from 'src/store/enums/dbNames';
 import { IS_PUBLIC_KEY, accessTokenConstant } from '../../store/constants';
-import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
-    @InjectModel(EDbNames.ACCESS_TOKEN)
     private readonly redisStateService: RedisService,
   ) {}
 
@@ -45,13 +42,13 @@ export class AuthGuard implements CanActivate {
 
       if (Date.now() >= payload.exp * 1000) {
         await this.redisStateService.clearKey(token);
-        throw new UnauthorizedException('Token has expired');
+        throw new UnauthorizedException('Token has expired.');
       }
 
       let tokenInfo = await this.redisStateService.getKey(token);
       tokenInfo = JSON.parse(tokenInfo);
 
-      if (!tokenInfo) {
+      if (!tokenInfo || !tokenInfo.isActive) {
         throw new UnauthorizedException();
       }
 
