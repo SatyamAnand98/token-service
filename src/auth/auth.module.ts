@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { RateLimitInterceptor } from 'src/decorators/rateLimiter/rateLimiter.interceptor';
-import { RedisService } from 'src/redis/redis.service';
 import { DatabaseModule } from 'src/store/Database/mongoDb.module';
 import { AuthGuard } from '../decorators/auth/auth.guard';
 import { RolesGuard } from '../decorators/roles/role.guard';
 import { accessTokenConstant } from '../store/constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -18,7 +15,6 @@ import { RedisModule } from 'src/redis/redis.module';
       secret: accessTokenConstant.secret,
     }),
     DatabaseModule,
-    RedisModule,
   ],
   providers: [
     AuthService,
@@ -30,8 +26,6 @@ import { RedisModule } from 'src/redis/redis.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    RateLimitInterceptor,
-    // RedisService,
   ],
   controllers: [AuthController],
   exports: [AuthService],

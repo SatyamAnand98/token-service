@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from 'src/redis/redis.service';
-import { PubSubService } from './pubsub.service';
+import { PubSubService } from './pub-sub.service';
 
 @Injectable()
 export class ConsumerService {
@@ -12,12 +12,13 @@ export class ConsumerService {
   }
 
   private subscribeToChannels() {
+    console.log('Subscribed to topic token_created');
     this.pubSubService.subscribe('token_created', async (message) => {
       console.log('Received message on token_created:', message);
       try {
-        const username = message.username;
+        const token = message.token;
 
-        this.redisStateService.setKey(username, message);
+        this.redisStateService.setKey(token, message);
       } catch (error) {
         console.log('Error:', error, message);
       }

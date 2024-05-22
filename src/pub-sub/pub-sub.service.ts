@@ -6,12 +6,11 @@ export class PubSubService {
   constructor(
     @Inject('REDIS_SUBSCRIBE_CLIENT') private readonly redisClient: Redis,
   ) {}
-
   async publish(channel: string, message: any) {
     await this.redisClient.publish(channel, JSON.stringify(message));
   }
-
   async subscribe(channel: string, callback: (message: any) => void) {
+    console.log('Subscribing to channel');
     await this.redisClient.subscribe(channel);
     this.redisClient.on('message', (chnl, message) => {
       if (chnl === channel) {
