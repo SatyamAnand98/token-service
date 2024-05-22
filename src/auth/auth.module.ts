@@ -8,6 +8,7 @@ import { accessTokenConstant } from '../store/constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RedisModule } from 'src/redis/redis.module';
+import { JwtGenerationService } from 'src/store/utils/jwt.service';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RedisModule } from 'src/redis/redis.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    JwtGenerationService,
   ],
   controllers: [AuthController],
   exports: [AuthService],

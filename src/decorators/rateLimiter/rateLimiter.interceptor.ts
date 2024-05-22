@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { RedisService } from 'src/redis/redis.service';
 import { IEvent } from 'src/store/interfaces/events.interface';
+import { IResponse } from 'src/store/interfaces/response.interface';
 
 @Injectable()
 export class RateLimitInterceptor implements NestInterceptor {
@@ -49,7 +50,14 @@ export class RateLimitInterceptor implements NestInterceptor {
       }
 
       if (remainingLimit <= 0) {
-        response.status(429).send('Rate limit exceeded');
+        const responseObj: IResponse = {
+          data: {},
+          message: 'Rate limit exceeded',
+          metadata: {
+            error: true,
+          },
+        };
+        response.status(429).json(responseObj);
         return;
       }
 
@@ -93,7 +101,6 @@ export class RateLimitInterceptor implements NestInterceptor {
         }),
       );
     } catch (error) {
-      console.error(error);
       response.status(500).send('Internal Server Error');
     }
   }

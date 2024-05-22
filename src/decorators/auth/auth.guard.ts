@@ -5,17 +5,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { RedisService } from 'src/redis/redis.service';
-import { EDbNames } from 'src/store/enums/dbNames';
 import { IS_PUBLIC_KEY, accessTokenConstant } from '../../store/constants';
+import { JwtGenerationService } from 'src/store/utils/jwt.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
+    private jwtService: JwtGenerationService,
     private reflector: Reflector,
     private readonly redisStateService: RedisService,
   ) {}
@@ -36,9 +34,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: accessTokenConstant.secret,
-      });
+      const payload = this.jwtService.verify(token);
 
       if (Date.now() >= payload.exp * 1000) {
         await this.redisStateService.clearKey(token);
