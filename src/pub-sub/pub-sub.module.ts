@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import Redis from 'ioredis';
+import { RedisModule } from 'src/redis/redis.module';
 import { PubSubController } from './pub-sub.controller';
 import { PubSubService } from './pub-sub.service';
-import Redis from 'ioredis';
 @Module({
+  imports: [RedisModule],
   controllers: [PubSubController],
   providers: [
     {

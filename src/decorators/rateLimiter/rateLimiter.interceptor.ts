@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { RedisService } from 'src/redis/redis.service';
+import { IEvent } from 'src/store/enums/event';
 
 @Injectable()
 export class RateLimitInterceptor implements NestInterceptor {
@@ -37,8 +38,7 @@ export class RateLimitInterceptor implements NestInterceptor {
         remainingLimit = tokenData.remainingRate;
         resetTimestamp = tokenData.resetTimestamp;
 
-        if (Date.now() > resetTimestamp) {
-          // If current time is past reset time, reset the rate limit
+        if (Date.now() > resetTimestamp || !resetTimestamp) {
           remainingLimit = rateLimit;
           resetTimestamp = Date.now() + rateLimitResetTime;
         }
@@ -54,13 +54,17 @@ export class RateLimitInterceptor implements NestInterceptor {
 
       remainingLimit -= 1;
 
-      await this.redisStateService.setKey(
-        token,
-        JSON.stringify({
-          remainingRate: remainingLimit,
-          resetTimestamp: resetTimestamp,
-        }),
-      );
+      const tokenData: IEvent = {
+        username: user.username,
+        rateLimiter: rateLimit,
+        iat: user.iat,
+        exp: user.exp,
+        role: user.role[0],
+        remainingRate: remainingLimit,
+        resetTimestamp,
+      };
+
+      await this.redisStateService.setKey(token, JSON.stringify(tokenData));
 
       const remainingSeconds = Math.floor((resetTimestamp - Date.now()) / 1000);
 

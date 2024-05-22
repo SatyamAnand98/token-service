@@ -10,6 +10,7 @@ import { DatabaseModule } from 'src/store/Database/mongoDb.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PubSubModule } from 'src/pub-sub/pub-sub.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PubSubModule } from 'src/pub-sub/pub-sub.module';
     AuthModule,
     MicroserviceModule,
     PubSubModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

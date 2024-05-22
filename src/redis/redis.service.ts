@@ -19,4 +19,15 @@ export class RedisService {
   async clearKey(key: string) {
     await this.redisClient.del(key);
   }
+
+  async listKeys() {
+    return this.redisClient.keys('*');
+  }
+
+  async deleteAllKeys() {
+    const keys = await this.listKeys();
+    keys.forEach((key) => {
+      this.clearKey(key);
+    });
+  }
 }

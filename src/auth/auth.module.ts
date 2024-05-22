@@ -7,6 +7,7 @@ import { RolesGuard } from '../decorators/roles/role.guard';
 import { accessTokenConstant } from '../store/constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthService } from './auth.service';
       secret: accessTokenConstant.secret,
     }),
     DatabaseModule,
+    RedisModule,
   ],
   providers: [
     AuthService,
