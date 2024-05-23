@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { AuthGuard } from './decorators/auth/auth.guard';
